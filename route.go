@@ -2,56 +2,44 @@ package main
 
 import (
 	"encoding/json"
+	"math/rand"
 	"net/http"
-)
 
-// Post represents a post entity
-type Post struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-	Text  string `json:"text"`
-}
+	"github.com/leogsouza/go-rest-api/entity"
+	"github.com/leogsouza/go-rest-api/repository"
+)
 
 var (
-	posts []Post
+	repo repository.PostRepository = repository.NewPostRepository()
 )
-
-func init() {
-	posts = []Post{{ID: 1, Title: "Title 1", Text: "Text 1"}}
-}
 
 func getPosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	result, err := json.Marshal(posts)
+	posts, err := repo.FindAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Error marshalling the posts array"}`))
+		w.Write([]byte(`{"error": "Error getting the posts"}`))
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
-	w.Write(result)
+	json.NewEncoder(w).Encode(posts)
 }
 
 func addPost(w http.ResponseWriter, r *http.Request) {
-	var post Post
+	var post entity.Post
 	err := json.NewDecoder(r.Body).Decode(&post)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"error": "Error unmarshalling the request"}`))
 		return
 	}
-	post.ID = len(posts) + 1
-	result, err := json.Marshal(post)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Error marshalling the request"}`))
-		return
-	}
+	post.ID = rand.Int63()
+	repo.Save(&post)
 
-	posts = append(posts, post)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	w.Write(result)
+	json.NewEncoder(w).Encode(post)
 
 }
