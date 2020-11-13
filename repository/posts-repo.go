@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/leogsouza/go-rest-api/entity"
 	"google.golang.org/api/iterator"
@@ -28,23 +29,29 @@ const (
 	collectionName string = "posts"
 )
 
-// Save saves a new post into collection
-func (rp *repo) Save(post *entity.Post) (*entity.Post, error) {
-	ctx := context.Background()
+func createClient(ctx context.Context) *firestore.Client {
 	sa := option.WithCredentialsFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		log.Fatalf("Failed to create a Firebase App: %v", err)
-		return nil, err
+		return nil
 	}
 	client, err := app.Firestore(ctx)
 	if err != nil {
 		log.Fatalf("Failed to create a Firestore client: %v", err)
-		return nil, err
+		return nil
 	}
+
+	return client
+}
+
+// Save saves a new post into collection
+func (rp *repo) Save(post *entity.Post) (*entity.Post, error) {
+	ctx := context.Background()
+	client := createClient(ctx)
 	defer client.Close()
 
-	_, _, err = client.Collection(collectionName).Add(ctx, map[string]interface{}{
+	_, _, err := client.Collection(collectionName).Add(ctx, map[string]interface{}{
 		"ID":    post.ID,
 		"Title": post.Title,
 		"Text":  post.Text,
@@ -61,17 +68,7 @@ func (rp *repo) Save(post *entity.Post) (*entity.Post, error) {
 // FindAll returns all posts from the collection
 func (rp *repo) FindAll() ([]entity.Post, error) {
 	ctx := context.Background()
-	sa := option.WithCredentialsFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-	app, err := firebase.NewApp(ctx, nil, sa)
-	if err != nil {
-		log.Fatalf("Failed to create a Firebase App: %v", err)
-		return nil, err
-	}
-	client, err := app.Firestore(ctx)
-	if err != nil {
-		log.Fatalf("Failed to create a Firestore client: %v", err)
-		return nil, err
-	}
+	client := createClient(ctx)
 	defer client.Close()
 
 	var posts []entity.Post = make([]entity.Post, 0)
