@@ -1,1 +1,3 @@
-# go-rest-api
+# Go Rest API
+
+Golang Rest API sample
