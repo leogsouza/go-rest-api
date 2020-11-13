@@ -24,7 +24,7 @@ func NewPostService() PostService {
 	return &service{}
 }
 
-func (*service) Validate(post *entity.Post) error {
+func (s *service) Validate(post *entity.Post) error {
 	if post == nil {
 		err := errors.New("The post is empty")
 		return err
@@ -37,11 +37,11 @@ func (*service) Validate(post *entity.Post) error {
 	return nil
 }
 
-func (*service) Create(post *entity.Post) (*entity.Post, error) {
+func (s *service) Create(post *entity.Post) (*entity.Post, error) {
 	post.ID = rand.Int63()
-	return repo.Save(&post)
+	return repo.Save(post)
 }
 
-func (*service) FindAll() ([]entity.Post, error) {
+func (s *service) FindAll() ([]entity.Post, error) {
 	return repo.FindAll()
 }
