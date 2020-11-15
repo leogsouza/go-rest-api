@@ -14,16 +14,18 @@ type PostService interface {
 	FindAll() ([]entity.Post, error)
 }
 
-var (
-	repo repository.PostRepository = repository.NewFirestoreRepository()
-)
-
-type service struct{}
-
-func NewPostService() PostService {
-	return &service{}
+type service struct {
+	repo repository.PostRepository
 }
 
+// NewPostService creates a new PostService instance
+func NewPostService(repo repository.PostRepository) PostService {
+	return &service{
+		repo,
+	}
+}
+
+// Validate validates de post data
 func (s *service) Validate(post *entity.Post) error {
 	if post == nil {
 		err := errors.New("The post is empty")
@@ -37,11 +39,13 @@ func (s *service) Validate(post *entity.Post) error {
 	return nil
 }
 
+// Create performs a new post creation
 func (s *service) Create(post *entity.Post) (*entity.Post, error) {
 	post.ID = rand.Int63()
-	return repo.Save(post)
+	return s.repo.Save(post)
 }
 
+// FindAll returns all posts
 func (s *service) FindAll() ([]entity.Post, error) {
-	return repo.FindAll()
+	return s.repo.FindAll()
 }

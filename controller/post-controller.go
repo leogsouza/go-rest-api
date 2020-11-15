@@ -9,26 +9,26 @@ import (
 	"github.com/leogsouza/go-rest-api/service"
 )
 
-var (
-	postService service.PostService = service.NewPostService()
-)
-
 // PostController holds the methods to handle posts requests
 type PostController interface {
 	GetPosts(w http.ResponseWriter, r *http.Request)
 	AddPost(w http.ResponseWriter, r *http.Request)
 }
 
-type controller struct{}
-
-// NewPostController creates a new  PostController instance
-func NewPostController() PostController {
-	return &controller{}
+type controller struct {
+	service service.PostService
 }
 
-func (*controller) GetPosts(w http.ResponseWriter, r *http.Request) {
+// NewPostController creates a new  PostController instance
+func NewPostController(serv service.PostService) PostController {
+	return &controller{
+		service: serv,
+	}
+}
+
+func (c *controller) GetPosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	posts, err := postService.FindAll()
+	posts, err := c.service.FindAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(errors.ServiceError{Message: "Error getting the posts"})
@@ -39,7 +39,7 @@ func (*controller) GetPosts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(posts)
 }
 
-func (*controller) AddPost(w http.ResponseWriter, r *http.Request) {
+func (c *controller) AddPost(w http.ResponseWriter, r *http.Request) {
 	var post entity.Post
 	err := json.NewDecoder(r.Body).Decode(&post)
 	if err != nil {
@@ -48,14 +48,14 @@ func (*controller) AddPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = postService.Validate(&post)
+	err = c.service.Validate(&post)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}
 
-	result, err := postService.Create(&post)
+	result, err := c.service.Create(&post)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(errors.ServiceError{Message: "Error saving the post"})

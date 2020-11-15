@@ -5,17 +5,22 @@ import (
 	"net/http"
 
 	router "github.com/leogsouza/go-rest-api/http"
+	"github.com/leogsouza/go-rest-api/repository"
+	"github.com/leogsouza/go-rest-api/service"
 
 	"github.com/leogsouza/go-rest-api/controller"
 )
 
 var (
-	postController controller.PostController = controller.NewPostController()
-	httpRouter     router.Router             = router.NewChiRouter()
+	httpRouter router.Router = router.NewChiRouter()
 )
 
 func main() {
 	const port string = ":8085"
+	repo := repository.NewFirestoreRepository()
+	serv := service.NewPostService(repo)
+
+	postController := controller.NewPostController(serv)
 
 	httpRouter.GET("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Up and running....")
