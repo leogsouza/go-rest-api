@@ -13,6 +13,7 @@ var (
 	postService service.PostService = service.NewPostService()
 )
 
+// PostController holds the methods to handle posts requests
 type PostController interface {
 	GetPosts(w http.ResponseWriter, r *http.Request)
 	AddPost(w http.ResponseWriter, r *http.Request)
@@ -20,6 +21,7 @@ type PostController interface {
 
 type controller struct{}
 
+// NewPostController creates a new  PostController instance
 func NewPostController() PostController {
 	return &controller{}
 }
@@ -29,7 +31,7 @@ func (*controller) GetPosts(w http.ResponseWriter, r *http.Request) {
 	posts, err := postService.FindAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(errors.ServiceError{"Error getting the posts"})
+		json.NewEncoder(w).Encode(errors.ServiceError{Message: "Error getting the posts"})
 		return
 	}
 
@@ -42,21 +44,21 @@ func (*controller) AddPost(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&post)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(errors.ServiceError{"Error unmarshalling the request"})
+		json.NewEncoder(w).Encode(errors.ServiceError{Message: "Error unmarshalling the request"})
 		return
 	}
 
 	err = postService.Validate(&post)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(errors.ServiceError{err.Error()})
+		json.NewEncoder(w).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}
 
 	result, err := postService.Create(&post)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(errors.ServiceError{"Error saving the post"})
+		json.NewEncoder(w).Encode(errors.ServiceError{Message: "Error saving the post"})
 		return
 	}
 
