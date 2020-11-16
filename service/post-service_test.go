@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/leogsouza/go-rest-api/entity"
+	"github.com/leogsouza/go-rest-api/repository"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,4 +28,27 @@ func TestValidateEmptyPostTitle(t *testing.T) {
 
 	assert.Equal(t, "The post title is empty", err.Error())
 
+}
+
+func TestFindAll(t *testing.T) {
+	mockRepo := new(repository.MockRepository)
+
+	var identifier int64 = 1
+
+	post := entity.Post{ID: identifier, Title: "A", Text: "B"}
+
+	// Setup expectations
+	mockRepo.On("FindAll").Return([]entity.Post{post}, nil)
+
+	testService := NewPostService(mockRepo)
+
+	result, _ := testService.FindAll()
+
+	// Mock Assert: Behavioral
+	mockRepo.AssertExpectations(t)
+
+	// Data Assertion
+	assert.Equal(t, identifier, result[0].ID)
+	assert.Equal(t, "A", result[0].Title)
+	assert.Equal(t, "B", result[0].Text)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/leogsouza/go-rest-api/repository"
 )
 
+// PostService holds the methods
 type PostService interface {
 	Validate(post *entity.Post) error
 	Create(post *entity.Post) (*entity.Post, error)
