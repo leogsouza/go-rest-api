@@ -17,7 +17,7 @@ var (
 
 func main() {
 	const port string = ":8085"
-	repo := repository.NewFirestoreRepository()
+	repo := repository.NewSQLiteRepository()
 	serv := service.NewPostService(repo)
 	carService := service.NewCarDetailsService()
 
