@@ -23,3 +23,8 @@ func (mock *MockRepository) FindAll() ([]entity.Post, error) {
 	result := args.Get(0)
 	return result.([]entity.Post), args.Error(1)
 }
+
+// Delete deletes a post from database
+func (mock *MockRepository) Delete(post *entity.Post) error {
+	return nil
+}

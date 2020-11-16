@@ -89,3 +89,8 @@ func (rp *repo) FindAll() ([]entity.Post, error) {
 
 	return posts, nil
 }
+
+// Delete deletes a post from database
+func (rp *repo) Delete(post *entity.Post) error {
+	return nil
+}

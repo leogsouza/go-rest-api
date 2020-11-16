@@ -95,3 +95,27 @@ func (sqlRepo *sqliteRepo) FindAll() ([]entity.Post, error) {
 	return posts, nil
 
 }
+
+// Delete deletes a post from database
+func (sqlRepo *sqliteRepo) Delete(post *entity.Post) error {
+	db, err := sql.Open("sqlite3", "./posts.db")
+
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	defer db.Close()
+	tx, _ := db.Begin()
+	stmt, _ := tx.Prepare("delete from posts where id =?")
+	_, err = stmt.Exec(post.ID)
+
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	tx.Commit()
+
+	return nil
+
+}
