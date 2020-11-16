@@ -21,22 +21,22 @@ type CarDetailsService interface {
 	GetDetails() entity.CarDetails
 }
 
-type carDetailsService struct{}
+type detailsService struct{}
 
 // NewCarDetailsService creates a new instance of CarDetailsService
 func NewCarDetailsService() CarDetailsService {
-	return &carDetailsService{}
+	return &detailsService{}
 }
 
 // GetDetails get details from car API
-func (service *carDetailsService) GetDetails() entity.CarDetails {
+func (service *detailsService) GetDetails() entity.CarDetails {
 	// go routine call endpoint 1
 	go carServ.FetchData()
 	// go routine call endpoint 2 get data from https://myfakeapi.com/api/users/1
 	go ownerServ.FetchData()
 
 	car, _ := getCarData()
-	owner, _ := getOwnerdata()
+	owner, _ := getOwnerData()
 
 	return entity.CarDetails{
 		ID:        car.ID,
@@ -68,7 +68,7 @@ func getCarData() (entity.Car, error) {
 	return car, nil
 }
 
-func getOwnerdata() (entity.Owner, error) {
+func getOwnerData() (entity.Owner, error) {
 	r1 := <-ownerDataChannel
 
 	var owner entity.Owner
