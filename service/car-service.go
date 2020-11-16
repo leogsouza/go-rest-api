@@ -30,6 +30,8 @@ func (c *carService) FetchData() {
 	// Call the external API
 	resp, _ := client.Get(carServiceURL)
 	fmt.Println("Response", resp)
-	// TODO: Write response to the channel
+
+	// Write response to the channel
+	carDataChannel <- resp
 
 }

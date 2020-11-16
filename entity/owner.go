@@ -2,7 +2,7 @@ package entity
 
 // Owner represents the User entity
 type Owner struct {
-	User OwnerData
+	OwnerData `json:"User"`
 }
 
 // OwnerData holds data from the owner entity

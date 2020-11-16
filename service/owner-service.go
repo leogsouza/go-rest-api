@@ -18,7 +18,7 @@ type ownerService struct{}
 
 // NewOwnerService creates a new CarService instance
 func NewOwnerService() OwnerService {
-	return &carService{}
+	return &ownerService{}
 }
 
 // FetchData fetches the owner data from specific endpoint
@@ -31,6 +31,7 @@ func (c *ownerService) FetchData() {
 	resp, _ := client.Get(carServiceURL)
 	fmt.Println("Response", resp)
 
-	// TODO: Write response to the channel
+	// Write response to the channel
+	ownerDataChannel <- resp
 
 }

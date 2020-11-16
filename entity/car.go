@@ -2,7 +2,7 @@ package entity
 
 // Car represents a car entity
 type Car struct {
-	Car CarData
+	CarData `json:"car"`
 }
 
 // CarData represents car details data
