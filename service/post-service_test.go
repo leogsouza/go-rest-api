@@ -30,6 +30,15 @@ func TestValidateEmptyPostTitle(t *testing.T) {
 
 }
 
+func TestValidateNilError(t *testing.T) {
+	post := &entity.Post{ID: 1, Title: "A", Text: "B"}
+
+	testService := NewPostService(nil)
+	err := testService.Validate(post)
+
+	assert.Nil(t, err)
+}
+
 func TestFindAll(t *testing.T) {
 	mockRepo := new(repository.MockRepository)
 
